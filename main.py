@@ -23,7 +23,7 @@ import yaml
 
 from agent.filters import filter_relevant
 from agent.notifier import send_job_alert
-from agent.scrapers import greenhouse, joberty, netcetera, vrabotuvanje
+from agent.scrapers import greenhouse, joberty, netcetera, smartrecruiters, vrabotuvanje
 from agent.storage import DEFAULT_DB_PATH, filter_new_jobs, mark_as_seen
 
 # Сите scrapers што агентот ги извршува. За нова компанија, додај ја нејзината
@@ -38,9 +38,12 @@ SCRAPERS = [
 # Патеката е во однос на main.py, па не зависи од папката од која стартуваме.
 COMPANIES_FILE = Path(__file__).resolve().parent / "config" / "companies.yaml"
 
-# Кој тип од companies.yaml со кој scraper се чита.
+# За секој type од companies.yaml: која scrape функција го чита
+# и кој параметар од yaml-от ѝ треба (покрај името на компанијата).
+# За нов ATS систем, додај ред тука.
 ATS_SCRAPERS = {
-    "greenhouse": greenhouse.scrape,
+    "greenhouse": (greenhouse.scrape, "board_token"),
+    "smartrecruiters": (smartrecruiters.scrape, "company_id"),
 }
 
 logger = logging.getLogger("agent")
@@ -49,27 +52,38 @@ logger = logging.getLogger("agent")
 def load_ats_tasks():
     """Ги чита компаниите од companies.yaml и за секоја подготвува scraper.
 
-    Враќа листа од парови (име, функција), на пр. ("greenhouse: Loka", ...).
+    Враќа два резултати:
+    - листа од парови (име, функција), на пр. ("greenhouse: Loka", ...)
+    - листа со имиња на компании што се погрешно запишани во yaml-от
     """
     with open(COMPANIES_FILE, encoding="utf-8") as file:
         # safe_load го чита YAML-от безбедно. "or {}" е за празен фајл.
         config = yaml.safe_load(file) or {}
 
     tasks = []
+    invalid = []
     for company in config.get("companies") or []:
+        name = company.get("name", "(без име)")
         company_type = company.get("type")
-        scraper = ATS_SCRAPERS.get(company_type)
-        if scraper is None:
-            logger.warning(
-                "companies.yaml: непознат type „%s“ за %s – прескокнувам.",
-                company_type,
-                company.get("name"),
-            )
+
+        # Непознат type: логираме грешка и продолжуваме со другите компании.
+        if company_type not in ATS_SCRAPERS:
+            logger.error("companies.yaml: непознат type „%s“ за %s.", company_type, name)
+            invalid.append(f"{company_type}: {name}")
             continue
+
+        scraper, param_name = ATS_SCRAPERS[company_type]
+
+        # Недостасува параметарот (на пр. board_token): исто така грешка.
+        if not company.get(param_name):
+            logger.error("companies.yaml: %s нема „%s“.", name, param_name)
+            invalid.append(f"{company_type}: {name}")
+            continue
+
         # partial ги „заклучува“ аргументите, па подоцна ја повикуваме само со ().
-        task = partial(scraper, company["name"], company["board_token"])
-        tasks.append((f"{company_type}: {company['name']}", task))
-    return tasks
+        task = partial(scraper, name, company[param_name])
+        tasks.append((f"{company_type}: {name}", task))
+    return tasks, invalid
 
 
 def run_scrapers():
@@ -87,8 +101,11 @@ def run_scrapers():
 
     # Ги додаваме ATS компаниите од companies.yaml. Ако фајлот не може да се
     # прочита, тоа го бележиме како пад, но постојните scrapers сепак работат.
+    # Погрешно запишаните компании ги бележиме како паднати, за да се видат во резимето.
     try:
-        tasks.extend(load_ats_tasks())
+        ats_tasks, invalid = load_ats_tasks()
+        tasks.extend(ats_tasks)
+        failed_scrapers.extend(invalid)
     except Exception:
         logger.exception("config/companies.yaml не може да се прочита")
         failed_scrapers.append("config/companies.yaml")

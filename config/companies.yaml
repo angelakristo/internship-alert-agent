@@ -2,11 +2,18 @@
 #
 # Секоја компанија има:
 #   name: име на компанијата (се прикажува во email-от)
-#   type: кој систем за огласи го користи (засега: greenhouse)
-#   board_token: името на компанијата во Greenhouse, од url-то
-#                boards-api.greenhouse.io/v1/boards/<board_token>/jobs
+#   type: кој систем за огласи го користи (greenhouse или smartrecruiters)
+#   и параметар според типот:
+#     greenhouse      → board_token: името на компанијата во Greenhouse, од url-то
+#                       boards-api.greenhouse.io/v1/boards/<board_token>/jobs
+#     smartrecruiters → company_id: името на компанијата во SmartRecruiters, од url-то
+#                       jobs.smartrecruiters.com/<company_id>
 
 companies:
   - name: Loka
     type: greenhouse
     board_token: lokainc
+
+  - name: Endava
+    type: smartrecruiters
+    company_id: Endava
