@@ -14,7 +14,7 @@ import sys
 
 from agent.filters import filter_relevant
 from agent.notifier import send_job_alert
-from agent.scrapers import netcetera, vrabotuvanje
+from agent.scrapers import joberty, netcetera, vrabotuvanje
 from agent.storage import DEFAULT_DB_PATH, filter_new_jobs, mark_as_seen
 
 # Сите scrapers што агентот ги извршува. За нова компанија, додај ја нејзината
@@ -22,6 +22,7 @@ from agent.storage import DEFAULT_DB_PATH, filter_new_jobs, mark_as_seen
 SCRAPERS = [
     netcetera.scrape,
     vrabotuvanje.scrape,
+    joberty.scrape,
 ]
 
 logger = logging.getLogger("agent")
