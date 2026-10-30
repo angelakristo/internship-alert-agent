@@ -1,0 +1,1 @@
+"""Internship Alert Agent package."""
