@@ -36,3 +36,11 @@ companies:
   - name: HTEC
     type: talentlyft
     career_domain: careers.htecgroup.com
+
+  - name: iBorn
+    type: teamtailor
+    career_domain: careers.iborn.net
+
+  - name: Proton
+    type: greenhouse
+    board_token: proton

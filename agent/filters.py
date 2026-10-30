@@ -18,6 +18,7 @@ INTERNSHIP_PREFIXES = [
     "praktikant",
     "internship",
     "trainee",
+    "ibornship",  # програмата за пракса на iBorn (на пр. „iBornship 2027“)
 ]
 
 # Зборови за пракса што мора да се совпаднат ТОЧНО, како цел збор.
@@ -178,6 +179,7 @@ if __name__ == "__main__":
         ("Пријави за праксата 2027", "MK"),
         ("Praktikantin Softwareentwicklung", "Remote"),
         ("Пракса во сметководство", "MK"),
+        ("iBornship 2027 – Frontend", "Skopje"),
     ]
 
     for title, location in examples:
@@ -201,9 +203,9 @@ if __name__ == "__main__":
 
         print(f"{title!r:32} | {location!r:18} | {result}")
 
-    # Проверка дека filter_relevant го враќа истото (очекувано 5 огласи).
+    # Проверка дека filter_relevant го враќа истото (очекувано 6 огласи).
     all_jobs = [
         Job("Example Corp", t, loc, f"https://example.com/{t}", "manual")
         for t, loc in examples
     ]
-    print(f"\nfilter_relevant врати {len(filter_relevant(all_jobs))} огласи (очекувано 5)")
+    print(f"\nfilter_relevant врати {len(filter_relevant(all_jobs))} огласи (очекувано 6)")
