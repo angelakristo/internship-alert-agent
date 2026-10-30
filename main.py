@@ -23,7 +23,15 @@ import yaml
 
 from agent.filters import filter_relevant
 from agent.notifier import send_job_alert
-from agent.scrapers import ashby, greenhouse, joberty, netcetera, smartrecruiters, vrabotuvanje
+from agent.scrapers import (
+    ashby,
+    greenhouse,
+    joberty,
+    netcetera,
+    smartrecruiters,
+    teamtailor,
+    vrabotuvanje,
+)
 from agent.storage import DEFAULT_DB_PATH, filter_new_jobs, mark_as_seen
 
 # Сите scrapers што агентот ги извршува. За нова компанија, додај ја нејзината
@@ -45,6 +53,7 @@ ATS_SCRAPERS = {
     "greenhouse": (greenhouse.scrape, "board_token"),
     "smartrecruiters": (smartrecruiters.scrape, "company_id"),
     "ashby": (ashby.scrape, "job_board_name"),
+    "teamtailor": (teamtailor.scrape, "career_domain"),
 }
 
 logger = logging.getLogger("agent")
