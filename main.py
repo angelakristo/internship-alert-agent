@@ -25,6 +25,7 @@ from agent.filters import filter_relevant
 from agent.notifier import send_job_alert
 from agent.scrapers import (
     ashby,
+    codechem,
     greenhouse,
     joberty,
     netcetera,
@@ -41,6 +42,7 @@ SCRAPERS = [
     netcetera.scrape,
     vrabotuvanje.scrape,
     joberty.scrape,
+    codechem.scrape,
 ]
 
 # Компаниите што користат систем за огласи (ATS) се во овој фајл.
