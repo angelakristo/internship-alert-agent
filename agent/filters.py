@@ -41,6 +41,24 @@ EXCLUDED_FIELD_WORDS = [
     "office",
 ]
 
+# Почетоци на македонски зборови за области што не се IT.
+# Се фаќаат и изведените облици, на пр. "сметковод" фаќа „сметководство“, „сметководител“.
+EXCLUDED_FIELD_PREFIXES = [
+    "маркетинг",
+    "продажб",
+    "продаж",
+    "сметковод",
+    "финанси",
+    "книговод",
+    "правн",
+    "право",
+    "администрати",
+    "човечки ресурси",
+    "регрутаци",
+    "продавач",
+    "комерцијал",
+]
+
 # Локации што ни одговараат. Доволно е локацијата да го СОДРЖИ зборот.
 LOCATION_WORDS = [
     "North Macedonia",
@@ -108,7 +126,10 @@ def is_internship(job: Job) -> bool:
 
 def is_excluded_field(job: Job) -> bool:
     """True ако насловот е за област што не е IT (маркетинг, продажба итн.)."""
-    return _contains_whole_word(job.title, EXCLUDED_FIELD_WORDS)
+    # Исфрлена е ако има цел англиски збор ИЛИ збор што почнува со македонски префикс.
+    return _contains_whole_word(job.title, EXCLUDED_FIELD_WORDS) or _contains_word_prefix(
+        job.title, EXCLUDED_FIELD_PREFIXES
+    )
 
 
 def is_location_ok(job: Job) -> bool:
@@ -156,6 +177,7 @@ if __name__ == "__main__":
         ("Backend Intern", "Hybrid, Berlin"),
         ("Пријави за праксата 2027", "MK"),
         ("Praktikantin Softwareentwicklung", "Remote"),
+        ("Пракса во сметководство", "MK"),
     ]
 
     for title, location in examples:
