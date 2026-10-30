@@ -2,7 +2,8 @@
 #
 # Секоја компанија има:
 #   name: име на компанијата (се прикажува во email-от)
-#   type: кој систем за огласи го користи (greenhouse, smartrecruiters, ashby или teamtailor)
+#   type: кој систем за огласи го користи
+#         (greenhouse, smartrecruiters, ashby, teamtailor или talentlyft)
 #   и параметар според типот:
 #     greenhouse      → board_token: името на компанијата во Greenhouse, од url-то
 #                       boards-api.greenhouse.io/v1/boards/<board_token>/jobs
@@ -12,6 +13,8 @@
 #                       jobs.ashbyhq.com/<job_board_name> (празните места се дозволени)
 #     teamtailor      → career_domain: доменот на Teamtailor career страницата,
 #                       без https:// (на пр. career.nionit.com)
+#     talentlyft      → career_domain: доменот на TalentLyft career страницата,
+#                       без https:// (на пр. careers.htecgroup.com)
 
 companies:
   - name: Loka
@@ -29,3 +32,7 @@ companies:
   - name: Nion
     type: teamtailor
     career_domain: career.nionit.com
+
+  - name: HTEC
+    type: talentlyft
+    career_domain: careers.htecgroup.com

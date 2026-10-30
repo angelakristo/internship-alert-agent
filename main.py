@@ -29,6 +29,7 @@ from agent.scrapers import (
     joberty,
     netcetera,
     smartrecruiters,
+    talentlyft,
     teamtailor,
     vrabotuvanje,
 )
@@ -54,6 +55,7 @@ ATS_SCRAPERS = {
     "smartrecruiters": (smartrecruiters.scrape, "company_id"),
     "ashby": (ashby.scrape, "job_board_name"),
     "teamtailor": (teamtailor.scrape, "career_domain"),
+    "talentlyft": (talentlyft.scrape, "career_domain"),
 }
 
 logger = logging.getLogger("agent")
