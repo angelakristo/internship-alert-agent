@@ -1,1 +1,12 @@
 # The list of companies whose Careers pages will be searched goes here.
+#
+# Секоја компанија има:
+#   name: име на компанијата (се прикажува во email-от)
+#   type: кој систем за огласи го користи (засега: greenhouse)
+#   board_token: името на компанијата во Greenhouse, од url-то
+#                boards-api.greenhouse.io/v1/boards/<board_token>/jobs
+
+companies:
+  - name: Loka
+    type: greenhouse
+    board_token: lokainc
