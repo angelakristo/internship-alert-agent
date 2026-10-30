@@ -2,12 +2,14 @@
 #
 # Секоја компанија има:
 #   name: име на компанијата (се прикажува во email-от)
-#   type: кој систем за огласи го користи (greenhouse или smartrecruiters)
+#   type: кој систем за огласи го користи (greenhouse, smartrecruiters или ashby)
 #   и параметар според типот:
 #     greenhouse      → board_token: името на компанијата во Greenhouse, од url-то
 #                       boards-api.greenhouse.io/v1/boards/<board_token>/jobs
 #     smartrecruiters → company_id: името на компанијата во SmartRecruiters, од url-то
 #                       jobs.smartrecruiters.com/<company_id>
+#     ashby           → job_board_name: името на компанијата во Ashby, од url-то
+#                       jobs.ashbyhq.com/<job_board_name> (празните места се дозволени)
 
 companies:
   - name: Loka
@@ -17,3 +19,7 @@ companies:
   - name: Endava
     type: smartrecruiters
     company_id: Endava
+
+  - name: IT Labs
+    type: ashby
+    job_board_name: IT Labs
