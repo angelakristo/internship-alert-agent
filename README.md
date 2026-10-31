@@ -122,12 +122,6 @@ If the company has its own custom career page, it needs a small scraper in `agen
 - The filter is keyword-based. A posting with a very unusual title could slip through or get missed.
 - Remote positions from other countries pass the filter on purpose, even though some of them are only open to people living in that country.
 
-## Ideas for later
-
-- Use a small AI model to classify postings that the keyword filter isn't sure about
-- Telegram notifications
-- A simple page that shows all postings the bot has found so far
-
 ## Tech
 
 Python 3.12 · Requests · BeautifulSoup · SQLite · PyYAML · GitHub Actions · Gmail SMTP
