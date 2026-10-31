@@ -32,6 +32,7 @@ from agent.scrapers import (
     netcetera,
     rldatix,
     smartrecruiters,
+    sorsix,
     talentlyft,
     teamtailor,
     vrabotuvanje,
@@ -47,6 +48,7 @@ SCRAPERS = [
     joberty.scrape,
     codechem.scrape,
     rldatix.scrape,
+    sorsix.scrape,
 ]
 
 # Компаниите што користат систем за огласи (ATS) се во овој фајл.
