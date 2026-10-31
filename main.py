@@ -59,11 +59,11 @@ def load_ats_tasks():
     tasks = []
     invalid = []
     for company in config.get("companies") or []:
-        name = company.get("name", "(без име)")
+        name = company.get("name", "(no name)")
         company_type = company.get("type")
 
         if company_type not in ATS_SCRAPERS:
-            logger.error("companies.yaml: непознат type „%s“ за %s.", company_type, name)
+            logger.error("companies.yaml: unknown type \"%s\" for %s.", company_type, name)
             invalid.append(f"{company_type}: {name}")
             continue
 
@@ -71,7 +71,7 @@ def load_ats_tasks():
 
         missing = [param for param in param_names if not company.get(param)]
         if missing:
-            logger.error("companies.yaml: %s нема „%s“.", name, ", ".join(missing))
+            logger.error("companies.yaml: %s is missing \"%s\".", name, ", ".join(missing))
             invalid.append(f"{company_type}: {name}")
             continue
 
@@ -92,16 +92,16 @@ def run_scrapers():
         tasks.extend(ats_tasks)
         failed_scrapers.extend(invalid)
     except Exception:
-        logger.exception("config/companies.yaml не може да се прочита")
+        logger.exception("config/companies.yaml could not be read")
         failed_scrapers.append("config/companies.yaml")
 
     for name, scraper in tasks:
         try:
             jobs = scraper()
-            logger.info("%s: пронајдени %d огласи", name, len(jobs))
+            logger.info("%s: found %d jobs", name, len(jobs))
             all_jobs.extend(jobs)
         except Exception:
-            logger.exception("%s: scraper-от падна", name)
+            logger.exception("%s: scraper failed", name)
             failed_scrapers.append(name)
     return all_jobs, failed_scrapers
 
@@ -111,7 +111,7 @@ def main() -> int:
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="изврши ги сите чекори, но НЕ праќај email и НЕ запишувај во базата",
+        help="run all steps, but do NOT send email and do NOT write to the database",
     )
     args = parser.parse_args()
 
@@ -121,7 +121,7 @@ def main() -> int:
     )
 
     if args.dry_run:
-        logger.info("DRY RUN: нема да се прати email и нема да се запише во базата.")
+        logger.info("DRY RUN: no email will be sent and nothing will be written to the database.")
 
     all_jobs, failed_scrapers = run_scrapers()
 
@@ -135,7 +135,7 @@ def main() -> int:
     email_sent = False
     email_failed = False
     if new_jobs and args.dry_run:
-        logger.info("DRY RUN: би се испратил email со %d огласи:", len(new_jobs))
+        logger.info("DRY RUN: would send an email with %d jobs:", len(new_jobs))
         for job in new_jobs:
             logger.info("  - %s | %s | %s | %s", job.company, job.title, job.location, job.url)
     elif new_jobs:
@@ -145,19 +145,19 @@ def main() -> int:
             mark_as_seen(new_jobs)
         except Exception:
             email_failed = True
-            logger.exception("Испраќањето email не успеа. Огласите НЕ се означени како видени.")
+            logger.exception("Sending the email failed. The jobs were NOT marked as seen.")
 
     logger.info(
-        "Резиме: вкупно %d огласи, %d релевантни, %d нови, email испратен: %s",
+        "Summary: %d jobs total, %d relevant, %d new, email sent: %s",
         len(all_jobs),
         len(relevant),
         len(new_jobs),
-        "да" if email_sent else "не",
+        "yes" if email_sent else "no",
     )
     if failed_scrapers:
-        logger.error("Паднати scrapers: %s", ", ".join(failed_scrapers))
+        logger.error("Failed scrapers: %s", ", ".join(failed_scrapers))
     else:
-        logger.info("Паднати scrapers: нема")
+        logger.info("Failed scrapers: none")
 
     return 1 if email_failed or failed_scrapers else 0
 

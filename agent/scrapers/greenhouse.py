@@ -42,7 +42,7 @@ def scrape(company_name: str, board_token: str) -> list[Job]:
 
     if not jobs:
         logger.warning(
-            "greenhouse (%s): пронајдени се 0 огласи. Провери го board token-от „%s“.",
+            "greenhouse (%s): found 0 jobs. Check the board token \"%s\".",
             company_name,
             board_token,
         )
@@ -56,4 +56,4 @@ if __name__ == "__main__":
     found_jobs = scrape("Loka", "lokainc")
     for job in found_jobs:
         print(f"- {job.title} | {job.company} | {job.location} | {job.url}")
-    print(f"Вкупно огласи: {len(found_jobs)}")
+    print(f"Total jobs: {len(found_jobs)}")

@@ -71,7 +71,7 @@ def scrape(company_name: str, domain: str, post_type: str) -> list[Job]:
 
     if not jobs:
         logger.info(
-            "wordpress (%s): нема огласи од последните %d дена.",
+            "wordpress (%s): no jobs from the last %d days.",
             company_name,
             MAX_AGE_DAYS,
         )
@@ -89,4 +89,4 @@ if __name__ == "__main__":
         found_jobs = scrape(name, site, kind)
         for job in found_jobs:
             print(f"- {job.title} | {job.company} | {job.url} | {job.description[:80]}")
-        print(f"{name}: вкупно огласи: {len(found_jobs)}")
+        print(f"{name}: total jobs: {len(found_jobs)}")

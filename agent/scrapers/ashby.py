@@ -51,7 +51,7 @@ def scrape(company_name: str, job_board_name: str) -> list[Job]:
 
     if not jobs:
         logger.warning(
-            "ashby (%s): пронајдени се 0 огласи. Провери го job_board_name „%s“.",
+            "ashby (%s): found 0 jobs. Check the job_board_name \"%s\".",
             company_name,
             job_board_name,
         )
@@ -65,4 +65,4 @@ if __name__ == "__main__":
     found_jobs = scrape("IT Labs", "IT Labs")
     for job in found_jobs:
         print(f"- {job.title} | {job.company} | {job.location} | {job.description} | {job.url}")
-    print(f"Вкупно огласи: {len(found_jobs)}")
+    print(f"Total jobs: {len(found_jobs)}")

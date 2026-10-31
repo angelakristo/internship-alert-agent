@@ -67,14 +67,14 @@ def scrape(company_name: str, company_id: str) -> list[Job]:
             break
     else:
         logger.warning(
-            "smartrecruiters (%s): прочитани се најмногу %d страници, можеби има уште огласи.",
+            "smartrecruiters (%s): read the maximum of %d pages, there may be more jobs.",
             company_name,
             MAX_PAGES,
         )
 
     if not jobs:
         logger.warning(
-            "smartrecruiters (%s): пронајдени се 0 огласи. Провери го company_id „%s“.",
+            "smartrecruiters (%s): found 0 jobs. Check the company_id \"%s\".",
             company_name,
             company_id,
         )
@@ -88,4 +88,4 @@ if __name__ == "__main__":
     found_jobs = scrape("Endava", "Endava")
     for job in found_jobs:
         print(f"- {job.title} | {job.company} | {job.location} | {job.url}")
-    print(f"Вкупно огласи: {len(found_jobs)}")
+    print(f"Total jobs: {len(found_jobs)}")

@@ -17,7 +17,7 @@ NO_POSITIONS_TEXT = "We currently do not have any open positions"
 
 def _parse_html(html: str) -> list[Job]:
     if NO_POSITIONS_TEXT in html:
-        logger.info("SORSIX: моментално нема отворени позиции.")
+        logger.info("SORSIX: no open positions at the moment.")
         return []
 
     soup = BeautifulSoup(html, "html.parser")
@@ -54,7 +54,7 @@ def _parse_html(html: str) -> list[Job]:
         )
 
     if not jobs:
-        raise RuntimeError("SORSIX објави позиции, но scraper-от не ги препозна – провери рачно")
+        raise RuntimeError("SORSIX published positions, but the scraper did not recognize them – check manually")
 
     return jobs
 
@@ -69,4 +69,4 @@ if __name__ == "__main__":
     found_jobs = scrape()
     for job in found_jobs:
         print(f"- {job.title} | {job.location} | {job.url}")
-    print(f"Вкупно огласи: {len(found_jobs)}")
+    print(f"Total jobs: {len(found_jobs)}")

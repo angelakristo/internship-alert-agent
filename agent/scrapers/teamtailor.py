@@ -75,7 +75,7 @@ def scrape(company_name: str, career_domain: str) -> list[Job]:
 
     if not jobs:
         logger.warning(
-            "teamtailor (%s): пронајдени се 0 огласи. Провери го career_domain „%s“.",
+            "teamtailor (%s): found 0 jobs. Check the career_domain \"%s\".",
             company_name,
             career_domain,
         )
@@ -89,4 +89,4 @@ if __name__ == "__main__":
     found_jobs = scrape("Nion", "career.nionit.com")
     for job in found_jobs:
         print(f"- {job.title} | {job.company} | {job.location} | {job.description} | {job.url}")
-    print(f"Вкупно огласи: {len(found_jobs)}")
+    print(f"Total jobs: {len(found_jobs)}")

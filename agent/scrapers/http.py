@@ -16,7 +16,7 @@ def fetch_html(url: str) -> str:
 
     if response.status_code != 200:
         raise RuntimeError(
-            f"Неуспешно симнување на {url}: статус {response.status_code}"
+            f"Failed to download {url}: status {response.status_code}"
         )
 
     return response.text

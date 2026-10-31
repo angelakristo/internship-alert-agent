@@ -78,8 +78,8 @@ def scrape() -> list[Job]:
 
     if total_cards == 0:
         logger.warning(
-            "vrabotuvanje: пронајдени се 0 огласи. Селекторите можеби се застарени "
-            "– провери ја структурата на %s",
+            "vrabotuvanje: found 0 jobs. The selectors may be outdated "
+            "– check the structure of %s",
             SEARCH_URL,
         )
 
@@ -92,4 +92,4 @@ if __name__ == "__main__":
     found_jobs = scrape()
     for job in found_jobs:
         print(f"- {job.title} | {job.company} | {job.location} | {job.url}")
-    print(f"Вкупно огласи: {len(found_jobs)}")
+    print(f"Total jobs: {len(found_jobs)}")

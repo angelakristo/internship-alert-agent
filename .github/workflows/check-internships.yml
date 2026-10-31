@@ -53,9 +53,9 @@ jobs:
 
           if [ "$DAYS" -ge 30 ]; then
             echo "$TODAY" > "$HEARTBEAT"
-            echo "Heartbeat ажуриран на $TODAY."
+            echo "Heartbeat updated to $TODAY."
           else
-            echo "Последниот heartbeat е пред $DAYS дена, нема потреба од нов."
+            echo "Last heartbeat was $DAYS days ago, no update needed."
           fi
 
       - name: Commit updated database
@@ -69,7 +69,7 @@ jobs:
           done
 
           if [ -z "$FILES" ]; then
-            echo "Нема променети фајлови за commit."
+            echo "No changed files to commit."
             exit 0
           fi
 

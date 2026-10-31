@@ -118,7 +118,7 @@ def scrape(company_name: str, careers_url: str) -> list[Job]:
             try:
                 page_html = fetch_html(link)
             except Exception:
-                logger.warning("jsonld (%s): не можам да го отворам %s", company_name, link)
+                logger.warning("jsonld (%s): could not open %s", company_name, link)
                 continue
             found.extend((posting, link) for posting in _job_postings_from_html(page_html))
 
@@ -146,7 +146,7 @@ def scrape(company_name: str, careers_url: str) -> list[Job]:
 
     if not jobs:
         logger.warning(
-            "jsonld (%s): пронајдени се 0 огласи. Провери дали %s сè уште има JobPosting податоци.",
+            "jsonld (%s): found 0 jobs. Check whether %s still has JobPosting data.",
             company_name,
             careers_url,
         )
@@ -160,4 +160,4 @@ if __name__ == "__main__":
     found_jobs = scrape("vector8", "https://www.vector8.com/en/careers")
     for job in found_jobs:
         print(f"- {job.title} | {job.company} | {job.location} | {job.description} | {job.url}")
-    print(f"Вкупно огласи: {len(found_jobs)}")
+    print(f"Total jobs: {len(found_jobs)}")

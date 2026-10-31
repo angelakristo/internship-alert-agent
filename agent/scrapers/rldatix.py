@@ -67,8 +67,8 @@ def scrape() -> list[Job]:
 
     if not jobs:
         logger.warning(
-            "RLDatix: пронајдени се 0 огласи. Селекторите можеби се застарени "
-            "– провери ја структурата на %s",
+            "RLDatix: found 0 jobs. The selectors may be outdated "
+            "– check the structure of %s",
             CAREERS_URL,
         )
 
@@ -81,4 +81,4 @@ if __name__ == "__main__":
     found_jobs = scrape()
     for job in found_jobs:
         print(f"- {job.title} | {job.location} | {job.description} | {job.url}")
-    print(f"Вкупно огласи: {len(found_jobs)}")
+    print(f"Total jobs: {len(found_jobs)}")

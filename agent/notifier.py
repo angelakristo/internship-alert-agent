@@ -25,7 +25,7 @@ def _load_settings() -> dict[str, str]:
         value = os.getenv(name)
         if not value:
             raise RuntimeError(
-                f"Недостасува поставката {name}. Додај ја во .env фајлот."
+                f"Missing setting {name}. Add it to the .env file."
             )
         settings[name] = value
     return settings
@@ -39,15 +39,15 @@ def _short_description(text: str) -> str:
 
 
 def _build_text_body(jobs: list[Job]) -> str:
-    lines = [f"Пронајдени се {len(jobs)} нови огласи за пракса:", ""]
+    lines = [f"Found {len(jobs)} new internship postings:", ""]
     for number, job in enumerate(jobs, start=1):
         lines.append(f"{number}. {job.title}")
-        lines.append(f"   Компанија: {job.company}")
-        lines.append(f"   Локација: {job.location or 'непозната'}")
+        lines.append(f"   Company: {job.company}")
+        lines.append(f"   Location: {job.location or 'unknown'}")
         description = _short_description(job.description)
         if description:
-            lines.append(f"   Опис: {description}")
-        lines.append(f"   Аплицирај: {job.url}")
+            lines.append(f"   Description: {description}")
+        lines.append(f"   Apply: {job.url}")
         lines.append("")
     return "\n".join(lines)
 
@@ -57,7 +57,7 @@ def _build_html_body(jobs: list[Job]) -> str:
     for job in jobs:
         title = html.escape(job.title)
         company = html.escape(job.company)
-        location = html.escape(job.location or "непозната")
+        location = html.escape(job.location or "unknown")
         description = html.escape(_short_description(job.description))
         url = html.escape(job.url, quote=True)
 
@@ -72,7 +72,7 @@ def _build_html_body(jobs: list[Job]) -> str:
               {description_html}
               <a href="{url}" style="display:inline-block;margin-top:8px;padding:8px 14px;
                  background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;">
-                Аплицирај
+                Apply
               </a>
             </div>
             """
@@ -81,7 +81,7 @@ def _build_html_body(jobs: list[Job]) -> str:
     return f"""
     <html>
       <body style="font-family:Arial,sans-serif;max-width:640px;margin:auto;">
-        <h2>{len(jobs)} нови огласи за пракса</h2>
+        <h2>{len(jobs)} new internship postings</h2>
         {''.join(cards)}
       </body>
     </html>
@@ -95,7 +95,7 @@ def send_job_alert(jobs: list[Job]) -> None:
     settings = _load_settings()
 
     message = EmailMessage()
-    message["Subject"] = f"{len(jobs)} нови огласи за пракса"
+    message["Subject"] = f"{len(jobs)} new internship postings"
     message["From"] = settings["EMAIL_SENDER"]
     message["To"] = settings["EMAIL_RECIPIENT"]
 
@@ -115,7 +115,7 @@ if __name__ == "__main__":
             location="Skopje",
             url="https://example.com/careers/1",
             source="manual",
-            description="Работа на backend сервиси во Python и учење од искусен тим.",
+            description="Work on backend services in Python and learn from an experienced team.",
         ),
         Job(
             company="Example Labs",
@@ -128,6 +128,6 @@ if __name__ == "__main__":
 
     try:
         send_job_alert(example_jobs)
-        print("Тест email-от е успешно испратен.")
+        print("Test email sent successfully.")
     except Exception as error:
-        print(f"Испраќањето не успеа: {error}")
+        print(f"Sending failed: {error}")

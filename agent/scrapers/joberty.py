@@ -73,8 +73,8 @@ def scrape() -> list[Job]:
 
     if not jobs:
         logger.warning(
-            "joberty: пронајдени се 0 огласи. Можеби нема огласи за Македонија, "
-            "или API-то е сменето – провери го %s",
+            "joberty: found 0 jobs. There may be no jobs for North Macedonia, "
+            "or the API has changed – check %s",
             API_URL,
         )
 
@@ -87,4 +87,4 @@ if __name__ == "__main__":
     found_jobs = scrape()
     for job in found_jobs:
         print(f"- {job.title} | {job.company} | {job.location} | {job.url}")
-    print(f"Вкупно огласи: {len(found_jobs)}")
+    print(f"Total jobs: {len(found_jobs)}")

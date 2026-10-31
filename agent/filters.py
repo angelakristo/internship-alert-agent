@@ -148,13 +148,13 @@ if __name__ == "__main__":
         )
 
         if not is_internship(job):
-            result = "НЕ ПОМИНУВА – не е пракса"
+            result = "REJECTED – not an internship"
         elif is_excluded_field(job):
-            result = "НЕ ПОМИНУВА – не-IT област"
+            result = "REJECTED – non-IT field"
         elif not is_location_ok(job):
-            result = "НЕ ПОМИНУВА – локација"
+            result = "REJECTED – location"
         else:
-            result = "ПОМИНУВА"
+            result = "ACCEPTED"
 
         print(f"{title!r:32} | {location!r:18} | {result}")
 
@@ -162,4 +162,4 @@ if __name__ == "__main__":
         Job("Example Corp", t, loc, f"https://example.com/{t}", "manual")
         for t, loc in examples
     ]
-    print(f"\nfilter_relevant врати {len(filter_relevant(all_jobs))} огласи (очекувано 6)")
+    print(f"\nfilter_relevant returned {len(filter_relevant(all_jobs))} jobs (expected 6)")

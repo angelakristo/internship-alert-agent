@@ -81,13 +81,13 @@ if __name__ == "__main__":
 
     try:
         new_jobs = filter_new_jobs(example_jobs, test_db)
-        print(f"Нови огласи пред зачувување: {len(new_jobs)} (очекувано 2)")
+        print(f"New jobs before saving: {len(new_jobs)} (expected 2)")
 
         mark_as_seen(new_jobs, test_db)
 
         new_jobs = filter_new_jobs(example_jobs, test_db)
-        print(f"Нови огласи после зачувување: {len(new_jobs)} (очекувано 0)")
+        print(f"New jobs after saving: {len(new_jobs)} (expected 0)")
     finally:
         if os.path.exists(test_db):
             os.remove(test_db)
-            print(f"Тест базата {test_db} е избришана.")
+            print(f"Test database {test_db} deleted.")

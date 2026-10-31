@@ -26,7 +26,7 @@ def _read_settings(base_url: str) -> dict:
     for key in ["subdomain", "themeId", "language", "layoutId"]:
         match = re.search(rf"{key}:\s*'([^']*)'", html)
         if match is None:
-            raise RuntimeError(f"TalentLyft: не најдов „{key}“ на {base_url}")
+            raise RuntimeError(f"TalentLyft: could not find \"{key}\" on {base_url}")
         settings[key] = match.group(1)
     return settings
 
@@ -48,7 +48,7 @@ def _fetch_job_list(base_url: str, settings: dict, page: int) -> str:
         timeout=TIMEOUT_SECONDS,
     )
     if response.status_code != 200:
-        raise RuntimeError(f"Неуспешно симнување на JobList од {base_url}: статус {response.status_code}")
+        raise RuntimeError(f"Failed to download JobList from {base_url}: status {response.status_code}")
     return response.text
 
 
@@ -99,7 +99,7 @@ def scrape(company_name: str, career_domain: str) -> list[Job]:
 
     if not jobs:
         logger.warning(
-            "talentlyft (%s): пронајдени се 0 огласи. Провери го career_domain „%s“.",
+            "talentlyft (%s): found 0 jobs. Check the career_domain \"%s\".",
             company_name,
             career_domain,
         )
@@ -113,4 +113,4 @@ if __name__ == "__main__":
     found_jobs = scrape("HTEC", "careers.htecgroup.com")
     for job in found_jobs:
         print(f"- {job.title} | {job.company} | {job.location} | {job.url}")
-    print(f"Вкупно огласи: {len(found_jobs)}")
+    print(f"Total jobs: {len(found_jobs)}")
