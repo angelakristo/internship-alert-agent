@@ -55,11 +55,6 @@ companies:
     domain: www.solutionade.net
     post_type: jobpost
 
-  - name: AXM365
-    type: wordpress
-    domain: careers.axm365.com
-    post_type: jobs
-
   - name: Slice
     type: greenhouse
     board_token: slice
