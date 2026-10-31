@@ -1,21 +1,17 @@
-# Име на workflow-от, како што ќе се прикажува во табот „Actions“ на GitHub.
+# GitHub Actions workflow that runs the internship alert agent every 6 hours
+# and commits the seen-jobs database and monthly heartbeat back to the repository.
+
 name: Check internships
 
-# Кога се стартува workflow-от.
 on:
-  # Автоматски на секои 6 часа (00:00, 06:00, 12:00, 18:00 по UTC).
   schedule:
     - cron: "0 */6 * * *"
-  # Рачно, со копчето „Run workflow“ во табот Actions.
   workflow_dispatch:
 
-# Не дозволуваме две проверки истовремено. Ако едната уште работи,
-# новата чека да заврши (не ја прекинуваме, за да не се изгуби запишувањето во базата).
 concurrency:
   group: check-internships
   cancel-in-progress: false
 
-# Дозвола workflow-от да прави commit и push (за базата со видени огласи).
 permissions:
   contents: write
 
@@ -24,24 +20,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Го симнуваме кодот од репото (заедно со data/jobs.db ако постои).
       - name: Checkout
         uses: actions/checkout@v5
 
-      # 2. Инсталираме Python 3.12. "cache: pip" ги памети симнатите пакети
-      #    помеѓу извршувањата, за инсталацијата да биде побрза.
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
 
-      # 3. Ги инсталираме пакетите од requirements.txt.
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # 4. Го стартуваме агентот. Поставките за email доаѓаат од GitHub Secrets
-      #    (Settings → Secrets and variables → Actions), а не од .env фајл.
       - name: Run agent
         run: python main.py
         env:
@@ -49,23 +39,12 @@ jobs:
           EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
 
-      # 5. Заштита од исклучување поради неактивност.
-      #    GitHub автоматски ги исклучува закажаните (cron) workflows во јавни
-      #    репоа ако 60 дена нема никаква активност (commit) во репото. Ако нема
-      #    нови огласи, базата не се менува и ботот не прави commit – па по 60 дена
-      #    агентот би престанал да работи без да те извести.
-      #    Затоа најмалку еднаш на 30 дена го запишуваме денешниот датум во
-      #    data/last_heartbeat.txt. Тоа е промена што следниот чекор ја commit-нува,
-      #    а бидејќи е само еднаш месечно, не ја полни историјата при секое стартување.
-      #    if: always() – и ова треба да се случи дури и ако main.py паднал.
       - name: Update heartbeat
         if: always()
         run: |
           HEARTBEAT=data/last_heartbeat.txt
           TODAY=$(date -u +%Y-%m-%d)
 
-          # Колку дена поминале од датумот во фајлот. Ако фајлот го нема или
-          # датумот не може да се прочита, сметаме дека поминале многу дена.
           if [ -f "$HEARTBEAT" ] && LAST=$(date -u -d "$(cat "$HEARTBEAT")" +%s 2>/dev/null); then
             DAYS=$(( ( $(date -u +%s) - LAST ) / 86400 ))
           else
@@ -79,16 +58,9 @@ jobs:
             echo "Последниот heartbeat е пред $DAYS дена, нема потреба од нов."
           fi
 
-      # 6. Ако базата или heartbeat-от се променети, ги враќаме во репото,
-      #    за следното извршување да знае кои огласи се веќе видени.
-      #    if: always() значи дека чекорот се извршува дури и ако претходниот
-      #    падне (на пр. main.py завршил со код 1 поради паднат scraper,
-      #    а email-от сепак е испратен и базата е ажурирана).
       - name: Commit updated database
         if: always()
         run: |
-          # Ги собираме фајловите што постојат и се нови или променети.
-          # "git status --porcelain" печати нешто само ако фајлот е нов или променет.
           FILES=""
           for FILE in data/jobs.db data/last_heartbeat.txt; do
             if [ -f "$FILE" ] && [ -n "$(git status --porcelain "$FILE")" ]; then
@@ -101,13 +73,10 @@ jobs:
             exit 0
           fi
 
-          # Се претставуваме како официјалниот GitHub Actions бот.
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add $FILES
-          # [skip ci] во пораката спречува овој commit да стартува нов workflow.
           git commit -m "Update seen jobs [skip ci]"
-          # Ако во меѓувреме некој направил push, прво ги земаме тие промени.
           git pull --rebase
           git push
