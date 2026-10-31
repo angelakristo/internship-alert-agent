@@ -49,23 +49,55 @@ jobs:
           EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
           EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
 
-      # 5. Ако базата е променета, ја враќаме во репото за следното извршување
-      #    да знае кои огласи се веќе видени.
+      # 5. Заштита од исклучување поради неактивност.
+      #    GitHub автоматски ги исклучува закажаните (cron) workflows во јавни
+      #    репоа ако 60 дена нема никаква активност (commit) во репото. Ако нема
+      #    нови огласи, базата не се менува и ботот не прави commit – па по 60 дена
+      #    агентот би престанал да работи без да те извести.
+      #    Затоа најмалку еднаш на 30 дена го запишуваме денешниот датум во
+      #    data/last_heartbeat.txt. Тоа е промена што следниот чекор ја commit-нува,
+      #    а бидејќи е само еднаш месечно, не ја полни историјата при секое стартување.
+      #    if: always() – и ова треба да се случи дури и ако main.py паднал.
+      - name: Update heartbeat
+        if: always()
+        run: |
+          HEARTBEAT=data/last_heartbeat.txt
+          TODAY=$(date -u +%Y-%m-%d)
+
+          # Колку дена поминале од датумот во фајлот. Ако фајлот го нема или
+          # датумот не може да се прочита, сметаме дека поминале многу дена.
+          if [ -f "$HEARTBEAT" ] && LAST=$(date -u -d "$(cat "$HEARTBEAT")" +%s 2>/dev/null); then
+            DAYS=$(( ( $(date -u +%s) - LAST ) / 86400 ))
+          else
+            DAYS=9999
+          fi
+
+          if [ "$DAYS" -ge 30 ]; then
+            echo "$TODAY" > "$HEARTBEAT"
+            echo "Heartbeat ажуриран на $TODAY."
+          else
+            echo "Последниот heartbeat е пред $DAYS дена, нема потреба од нов."
+          fi
+
+      # 6. Ако базата или heartbeat-от се променети, ги враќаме во репото,
+      #    за следното извршување да знае кои огласи се веќе видени.
       #    if: always() значи дека чекорот се извршува дури и ако претходниот
       #    падне (на пр. main.py завршил со код 1 поради паднат scraper,
       #    а email-от сепак е испратен и базата е ажурирана).
       - name: Commit updated database
         if: always()
         run: |
-          # Ако базата не постои (на пр. агентот паднал пред да ја креира), нема што да правиме.
-          if [ ! -f data/jobs.db ]; then
-            echo "data/jobs.db не постои, нема што да се commit-не."
-            exit 0
-          fi
-
+          # Ги собираме фајловите што постојат и се нови или променети.
           # "git status --porcelain" печати нешто само ако фајлот е нов или променет.
-          if [ -z "$(git status --porcelain data/jobs.db)" ]; then
-            echo "Базата не е променета."
+          FILES=""
+          for FILE in data/jobs.db data/last_heartbeat.txt; do
+            if [ -f "$FILE" ] && [ -n "$(git status --porcelain "$FILE")" ]; then
+              FILES="$FILES $FILE"
+            fi
+          done
+
+          if [ -z "$FILES" ]; then
+            echo "Нема променети фајлови за commit."
             exit 0
           fi
 
@@ -73,7 +105,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add data/jobs.db
+          git add $FILES
           # [skip ci] во пораката спречува овој commit да стартува нов workflow.
           git commit -m "Update seen jobs [skip ci]"
           # Ако во меѓувреме некој направил push, прво ги земаме тие промени.
