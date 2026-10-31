@@ -34,6 +34,7 @@ from agent.scrapers import (
     talentlyft,
     teamtailor,
     vrabotuvanje,
+    wordpress,
 )
 from agent.storage import DEFAULT_DB_PATH, filter_new_jobs, mark_as_seen
 
@@ -52,14 +53,16 @@ SCRAPERS = [
 COMPANIES_FILE = Path(__file__).resolve().parent / "config" / "companies.yaml"
 
 # За секој type од companies.yaml: која scrape функција го чита
-# и кој параметар од yaml-от ѝ треба (покрај името на компанијата).
+# и кои параметри од yaml-от ѝ требаат (покрај името на компанијата),
+# по редоследот по кој функцијата ги прима.
 # За нов ATS систем, додај ред тука.
 ATS_SCRAPERS = {
-    "greenhouse": (greenhouse.scrape, "board_token"),
-    "smartrecruiters": (smartrecruiters.scrape, "company_id"),
-    "ashby": (ashby.scrape, "job_board_name"),
-    "teamtailor": (teamtailor.scrape, "career_domain"),
-    "talentlyft": (talentlyft.scrape, "career_domain"),
+    "greenhouse": (greenhouse.scrape, ["board_token"]),
+    "smartrecruiters": (smartrecruiters.scrape, ["company_id"]),
+    "ashby": (ashby.scrape, ["job_board_name"]),
+    "teamtailor": (teamtailor.scrape, ["career_domain"]),
+    "talentlyft": (talentlyft.scrape, ["career_domain"]),
+    "wordpress": (wordpress.scrape, ["domain", "post_type"]),
 }
 
 logger = logging.getLogger("agent")
@@ -88,16 +91,18 @@ def load_ats_tasks():
             invalid.append(f"{company_type}: {name}")
             continue
 
-        scraper, param_name = ATS_SCRAPERS[company_type]
+        scraper, param_names = ATS_SCRAPERS[company_type]
 
-        # Недостасува параметарот (на пр. board_token): исто така грешка.
-        if not company.get(param_name):
-            logger.error("companies.yaml: %s нема „%s“.", name, param_name)
+        # Недостасува некој параметар (на пр. board_token): исто така грешка.
+        missing = [param for param in param_names if not company.get(param)]
+        if missing:
+            logger.error("companies.yaml: %s нема „%s“.", name, ", ".join(missing))
             invalid.append(f"{company_type}: {name}")
             continue
 
         # partial ги „заклучува“ аргументите, па подоцна ја повикуваме само со ().
-        task = partial(scraper, name, company[param_name])
+        params = [company[param] for param in param_names]
+        task = partial(scraper, name, *params)
         tasks.append((f"{company_type}: {name}", task))
     return tasks, invalid
 
