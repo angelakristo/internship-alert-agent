@@ -28,6 +28,7 @@ from agent.scrapers import (
     codechem,
     greenhouse,
     joberty,
+    jsonld,
     netcetera,
     rldatix,
     smartrecruiters,
@@ -63,6 +64,7 @@ ATS_SCRAPERS = {
     "teamtailor": (teamtailor.scrape, ["career_domain"]),
     "talentlyft": (talentlyft.scrape, ["career_domain"]),
     "wordpress": (wordpress.scrape, ["domain", "post_type"]),
+    "jsonld": (jsonld.scrape, ["careers_url"]),
 }
 
 logger = logging.getLogger("agent")
